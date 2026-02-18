@@ -13,42 +13,35 @@
 
 | Приоритет | Критерии |
 |-----------|----------|
-| **1** | Угроза жизни: газ, пожар, дым, искрение проводки|
+| **1** | Угроза жизни: газ, пожар, дым, искрение проводки |
 | **2** | Угроза здоровью: затопление, лед перед входной дверью |
 | **3** | Серьёзное неудобство: нет ГВС >1 дня, мусор в подъезде, застрял лифт с людьми |
 | **4** | Бытовая проблема: течёт кран, скрипит дверь |
 | **5** | Эстетика: грязные окна, сколы на стенах, паутина |
 | **6** | Пожелание: «хотим», «установите», «покрасьте» |
 
+## Технологии
+
 - **Ollama** — локальный запуск LLM (модель `gemma3:4b`)
+- **n8n** — платформа для автоматизации рабочих процессов
+- **Docker Compose** — унифицированное развёртывание
 
 ## Для начала работы
 
-### 1. Установите зависимости
+Установите зависимости: выполните в PowerShell `winget install Ollama.Ollama`, затем `ollama pull gemma3:4b`, после этого установите Docker Desktop через `winget install Docker.DockerDesktop`. 
 
-```powershell
-# Ollama
-winget install Ollama.Ollama
-ollama pull gemma3:4b
+Запустите Ollama в отдельном терминале командой `ollama serve`. 
 
-# Docker + n8n
-winget install Docker.DockerDesktop
-docker run -it --rm --name n8n -p 5678:5678 -v n8n_data:/home/node/.n8n docker.n8n.io/n8nio/n8n
-```
+Скопируйте шаблон окружения: `copy .env.example .env`, а после измените значения на свои. 
 
-### 2. Импортируйте воркфлоу
+Запустите n8n через Docker Compose командой `docker-compose up -d`. 
 
-1. Откройте `http://localhost:5678`
-2. `☰ → Import` → выберите `workflow/n8n-workflow.json`
-3. Нажмите Public в верхней части экрана
+Импортируйте конфигурацию: перейдите в папку `setup` и выполните `powershell -ExecutionPolicy Bypass -File .\init.ps1` — скрипт автоматически импортирует credentials и workflow. 
 
-### 3. Запустите интерфейс
+Откройте в браузере `http://localhost:5678`, найдите воркфлоу «jkh-priority-workflow» и активируйте его. 
 
-Откройте `interface.html` в браузере — готово к тестированию!
+Теперь откройте файл `interface.html` в браузере — система готова к тестированию.
 
-### Тесты
+## Тесты
 
-```powershell
-cd tests
-powershell -ExecutionPolicy Bypass -File .\run-tests.ps1
-```
+Для запуска тестов перейдите в папку `tests` и выполните `powershell -ExecutionPolicy Bypass -File .\run-tests.ps1`.
