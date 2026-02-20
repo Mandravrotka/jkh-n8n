@@ -11,47 +11,13 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -1008,
-        160
+        736,
+        336
       ],
-      "id": "2a6845dd-cac8-43b5-9873-24159769657d",
+      "id": "ff9c742c-3c42-48d9-9838-4866b6a4d956",
       "name": "Запрос начальных данных",
       "webhookId": "9a4f32a3-124b-4928-bb92-9632ac49020c",
       "alwaysOutputData": false
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "f5c88238-3979-484e-b270-dff81b155727",
-              "leftValue": "={{ $json.body.message }}",
-              "rightValue": "",
-              "operator": {
-                "type": "string",
-                "operation": "notEmpty",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        -784,
-        160
-      ],
-      "id": "4baf5947-4a2d-4895-a576-66e7867e513c",
-      "name": "Запрос не пустой?"
     },
     {
       "parameters": {
@@ -64,7 +30,7 @@
         "messages": {
           "values": [
             {
-              "content": "=Текст заявки: \"{{ $json.body.message }}\"\nОписание жильца: \"{{ $json.body.resident_notes }}\"\n\nЭто осмысленный текст в контексте заявки в ЖКХ? \n\nУчти, что очень часто могут появляться опечатки или просто шутки, определяй их правильно.\nСтарайся учитывать особые группы населения: инвалиды, пенсионеры и т.д, но только если там не написан полный бред.\nОтветь ТОЛЬКО \"1\" если да, \"0\" если нет (бред, троллинг, мат, пустота, непонятный набор символов, невозможные опечатки)."
+              "content": "=Ты — эксперт по ЖКХ России. Определи приоритет заявки.\n\nТип заявки: [Execute previous nodes for preview]\n\nКРИТЕРИИ ПРИОРИТЕТОВ:\n1 = угроза жизни: ГАЗ, ПОЖАР, ДЫМ, ИСКРЕНИЕ ПРОВОДКИ\n2 = угроза здоровью: затопление, лед перед входной дверью\n3 = серьёзное неудобство: нет ГВС >1 дня, мусор в подъезде, застрял лифт с людьми\n4 = бытовая проблема: течёт кран, скрипит дверь, нет ХВС <1 дня, нет света в подъезде\n5 = эстетика: грязные окна, паутина, сколы на стенах\n6 = пожелание: слова \"хотим\", \"добавьте\", \"установите\", \"покрасьте\"\n\nВАЖНО:\n- Анализируй опасность ДЛЯ ВСЕХ жильцов, не только заявителя\n- Если угроза жизни — игнорируй статус жильца (всегда приоритет 1)\n- Зимой отопление = критично, летом = не критично\n\nДАННЫЕ:\nТекст заявки: {{ $('Запрос начальных данных').item.json.body.message }}\nПримечания к жильцу: {{ $('Запрос начальных данных').item.json.body.resident_notes }}\nДата: {{ $('Запрос начальных данных').item.json.body.currentDateTime }}\n\nФОРМАТ ОТВЕТА:\n{\n  \"priority\": \"ТОЛЬКО ЦИФРА ОТ 1 ДО 6\",\n  \"explanation\": \"краткое объяснение на русском языке (до 100 символов)\"\n}\n\nВАЖНО: ОТВЕЧАЙ ТОЛЬКО ЧИСТЫМ JSON БЕЗ КОДОВЫХ БЛОКОВ, БЕЗ КОММЕНТАРИЕВ, БЕЗ ПОЯСНЕНИЙ. НЕ ИСПОЛЬЗУЙ ```json ИЛИ ```.\nТОЛЬКО {\"priority\":\"цифра\",\"explanation\":\"текст\"}."
             }
           ]
         },
@@ -73,11 +39,11 @@
       "type": "@n8n/n8n-nodes-langchain.ollama",
       "typeVersion": 1,
       "position": [
-        -560,
-        80
+        2768,
+        336
       ],
-      "id": "d2e6ce96-bffe-42fe-80db-de70e7d0ddaf",
-      "name": "Проверка осмысленности ввода",
+      "id": "d0c83767-514e-4aa3-a04e-64f93ee8d976",
+      "name": "Получение приоритета",
       "credentials": {
         "ollamaApi": {
           "id": "ljirGh5nNJSqyEgS",
@@ -87,71 +53,40 @@
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "loose",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "2277d278-dd98-4548-9bdb-445c04415efe",
-              "leftValue": "={{ $json.content }}",
-              "rightValue": 1,
-              "operator": {
-                "type": "number",
-                "operation": "equals"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "looseTypeValidation": true,
+        "respondWith": "allIncomingItems",
         "options": {}
       },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
       "position": [
-        -208,
-        80
+        3728,
+        320
       ],
-      "id": "e80e59e6-0b4f-4aae-a784-1a273e0eea4e",
-      "name": "Запрос имеет смысл?"
+      "id": "0b02c388-6972-4839-aae4-8eeed237aae2",
+      "name": "Возвращение результата"
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
+        "assignments": {
+          "assignments": [
             {
-              "id": "e78f6e1f-cf31-4189-9922-44a1baa328b4",
-              "leftValue": "={{ $json.body.timestamp }}",
-              "rightValue": "",
-              "operator": {
-                "type": "string",
-                "operation": "exists",
-                "singleValue": true
-              }
+              "id": "e934b0ff-de02-4d7c-a784-35b667c1af73",
+              "name": "message",
+              "value": "Не требует действия",
+              "type": "string"
             }
-          ],
-          "combinator": "and"
+          ]
         },
         "options": {}
       },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
       "position": [
-        16,
-        32
+        2144,
+        512
       ],
-      "id": "eeec3aff-4abf-41bf-b529-709f403833b6",
-      "name": "Дата указана?"
+      "id": "ef7147ca-9293-4d9b-aabd-6c9f44577df9",
+      "name": "Не требует действия"
     },
     {
       "parameters": {
@@ -161,11 +96,75 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        240,
-        352
+        2448,
+        512
       ],
-      "id": "f243e5e4-2964-478e-a0b6-69e114b33db6",
-      "name": "Некорректный/Бессмысленный ввод"
+      "id": "04b783f8-6473-4a07-9acf-e307e69ea3d3",
+      "name": "Ответ на не требующий действия ввод"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gemma3:4b",
+          "mode": "list",
+          "cachedResultName": "gemma3:4b"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Проанализируй сообщение и перечисли ВСЕ проблемы, которые упомянуты или подразумеваются. Не ограничивайся только явным текстом — ищи косвенные признаки опасности. Учитывай статус жильца, связан ли он с проблемой.\n\n\nФОРМАТ ОТВЕТА:\n{\n  \"explicit_problems\": [\"проблемы, указанные прямо\"],\n  \"implicit_problems\": [\"скрытые угрозы, которые можно вывести из контекста\"],\n  \"risk_factors\": [\"факторы, усиливающие опасность (время, статус жильца, погода)\"]\n}\n\nСООБЩЕНИЕ: \"{{ $('Запрос начальных данных').item.json.body.message }}\"\nСТАТУС ЖИЛЬЦА: \"{{ $('Запрос начальных данных').item.json.body.resident_notes }}\"\nДАТА И ВРЕМЯ: \"{{ $('Запрос начальных данных').item.json.body.currentDateTime }}\"\n\nУЧИТЫВАЙ СКРЫТЫЕ УГРОЗЫ\nВАЖНО: ОТВЕЧАЙ ТОЛЬКО ЧИСТЫМ JSON БЕЗ КОДОВЫХ БЛОКОВ, БЕЗ КОММЕНТАРИЕВ, БЕЗ ПОЯСНЕНИЙ. НЕ ИСПОЛЬЗУЙ ```json ИЛИ ```."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.ollama",
+      "typeVersion": 1,
+      "position": [
+        2128,
+        144
+      ],
+      "id": "25370159-7505-4f84-90e0-d3db391b1c7c",
+      "name": "Анализ возможеных проблем",
+      "credentials": {
+        "ollamaApi": {
+          "id": "ljirGh5nNJSqyEgS",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gemma3:4b",
+          "mode": "list",
+          "cachedResultName": "gemma3:4b"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Для КАЖДОЙ проблемы из списка оцени потенциальные последствия по шкале:\n\nПОСЛЕДСТВИЯ:\n- катастрофические: смерть, взрыв, массовое отравление, пожар всего дома\n- критические: травмы, госпитализация, затопление нескольких квартир\n- серьёзные: материальный ущерб, временная непригодность жилья\n- умеренные: дискомфорт, необходимость ремонта\n\nФОРМАТ ОТВЕТА:\n{\n  \"consequences\": [\n    {\n      \"problem\": \"проблема из списка\",\n      \"severity\": \"катастрофические/критические/серьёзные/умеренные\",\n      \"timeline\": \"как быстро последствия наступят (секунды/минуты/часы/дни)\",\n      \"affected_scope\": \"кто пострадает (один человек/квартира/подъезд/весь дом)\"\n    }\n  ]\n}\n\nПРОБЛЕМЫ: {{ $json.content }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.ollama",
+      "typeVersion": 1,
+      "position": [
+        2448,
+        144
+      ],
+      "id": "02d66826-7c2e-45e1-8124-47a63236c6e8",
+      "name": "Анализ последствий",
+      "credentials": {
+        "ollamaApi": {
+          "id": "ljirGh5nNJSqyEgS",
+          "name": "Ollama account"
+        }
+      }
     },
     {
       "parameters": {
@@ -179,7 +178,7 @@
           "conditions": [
             {
               "id": "4265a567-56fe-47ec-878c-e6557825c2dc",
-              "leftValue": "={{ $json.explanation }}",
+              "leftValue": "={{ $('Запрос начальных данных').item.json.body.explanation }}",
               "rightValue": 1,
               "operator": {
                 "type": "number",
@@ -195,10 +194,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        688,
-        32
+        3312,
+        336
       ],
-      "id": "314d2c73-7b12-4e12-8fc3-dca29fd004d3",
+      "id": "12789762-2ba7-4302-93a6-1f537586fb69",
       "name": "Нужно объяснение выбора?"
     },
     {
@@ -206,9 +205,9 @@
         "assignments": {
           "assignments": [
             {
-              "id": "e934b0ff-de02-4d7c-a784-35b667c1af73",
-              "name": "message",
-              "value": "Некорректный/Бессмысленный ввод.",
+              "id": "34e83ad4-0556-4f07-9eaa-a24307f35801",
+              "name": "priority",
+              "value": "={{ $('Парсер json').item.json.priority }}",
               "type": "string"
             }
           ]
@@ -218,57 +217,24 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        16,
-        352
+        3520,
+        416
       ],
-      "id": "08d44e05-f599-41e1-82ae-f8a1a7523006",
-      "name": "Некорректный/Бессмысленный ввод json"
+      "id": "580a3539-8b60-4eca-9ce8-21d2ae8d570c",
+      "name": "Только приоритет"
     },
     {
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "e934b0ff-de02-4d7c-a784-35b667c1af73",
-              "name": "chatInput",
-              "value": "=Ты — эксперт по ЖКХ России. Определи приоритет заявки.\n\nКРИТЕРИИ ПРИОРИТЕТОВ:\n1 = угроза жизни: ГАЗ, ПОЖАР, ДЫМ, ИСКРЕНИЕ ПРОВОДКИ\n2 = угроза здоровью: затопление, лед перед входной дверью, нет отопления\n3 = серьёзное неудобство: нет ГВС >1 дня, мусор в подъезде, застрял лифт с людьми\n4 = бытовая проблема: течёт кран, скрипит дверь, нет ХВС <1 дня, нет света в подъезде\n5 = эстетика: грязные окна, паутина, сколы на стенах\n6 = пожелание: слова \"хотим\", \"добавьте\", \"установите\", \"покрасьте\"\n\nВАЖНО:\n- Анализируй опасность ДЛЯ ВСЕХ жильцов, не только заявителя\n- Если угроза жизни — игнорируй статус жильца (всегда приоритет 1)\n- Зимой отопление = критично, летом = не критично\n\nДАННЫЕ:\nТекст заявки: \"{{ $json.message }}\"\nПримечания к жильцу: \"{{ $json.resident_notes }}\"\nДата: \"{{ $json.currentDate }}\"\n\nФОРМАТ ОТВЕТА:\n{\n  \"priority\": \"ТОЛЬКО ЦИФРА ОТ 1 ДО 6\",\n  \"explanation\": \"краткое объяснение на русском языке (до 100 символов)\"\n}\n\nВАЖНО: ОТВЕЧАЙ ТОЛЬКО ЧИСТЫМ JSON БЕЗ КОДОВЫХ БЛОКОВ, БЕЗ КОММЕНТАРИЕВ, БЕЗ ПОЯСНЕНИЙ. НЕ ИСПОЛЬЗУЙ ```json ИЛИ ```.\nТОЛЬКО {\"priority\":\"цифра\",\"explanation\":\"текст\"}.",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
+        "jsCode": "return JSON.parse($input.first().json.content\n    .replace(/```json\\s*|\\s*```/gi, '')\n    .trim());\n\n"
       },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
-        912,
-        -64
+        3104,
+        336
       ],
-      "id": "2763222c-c86e-4cc5-a4c1-9790e0740e4f",
-      "name": "Промпт с объяснением выбора приоритета"
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "e934b0ff-de02-4d7c-a784-35b667c1af73",
-              "name": "chatInput",
-              "value": "=Ты — эксперт по ЖКХ России. Определи приоритет заявки.\n\nКРИТЕРИИ ПРИОРИТЕТОВ:\n1 = угроза жизни: ГАЗ, ПОЖАР, ДЫМ, ИСКРЕНИЕ ПРОВОДКИ\n2 = угроза здоровью: затопление, лед перед входной дверью\n3 = серьёзное неудобство: нет ГВС >1 дня, мусор в подъезде, застрял лифт с людьми\n4 = бытовая проблема: течёт кран, скрипит дверь, нет ХВС <1 дня, нет света в подъезде\n5 = эстетика: грязные окна, паутина, сколы на стенах\n6 = пожелание: слова \"хотим\", \"добавьте\", \"установите\", \"покрасьте\"\n\nВАЖНО:\n- Анализируй опасность ДЛЯ ВСЕХ жильцов, не только заявителя\n- Если угроза жизни — игнорируй статус жильца (всегда приоритет 1)\n- Зимой отопление = критично, летом = не критично\n\nДАННЫЕ:\nТекст заявки: \"{{ $json.message }}\"\nПримечания к жильцу: \"{{ $json.resident_notes }}\"\nДата: \"{{ $json.currentDate }}\"\n\nФОРМАТ ОТВЕТА:\n{\n  \"priority\": \"ТОЛЬКО ЦИФРА ОТ 1 ДО 6\"\n}\n\nВАЖНО: ОТВЕЧАЙ ТОЛЬКО ЧИСТЫМ JSON БЕЗ КОДОВЫХ БЛОКОВ, БЕЗ КОММЕНТАРИЕВ, БЕЗ ПОЯСНЕНИЙ. НЕ ИСПОЛЬЗУЙ ```json ИЛИ ```.\nТОЛЬКО {\"priority\":\"цифра\"}.",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        912,
-        128
-      ],
-      "id": "fefed813-e4b1-474f-a74b-3e7690d9f921",
-      "name": "Промпт без объяснения выбора приоритета"
+      "id": "2e43a3d3-dc65-4535-aa83-0d964423b2bf",
+      "name": "Парсер json"
     },
     {
       "parameters": {
@@ -281,7 +247,7 @@
         "messages": {
           "values": [
             {
-              "content": "={{ $json.chatInput }}"
+              "content": "=ПРОВЕДИ ТЩАТЕЛЬНЫЙ АНАЛИЗ ПОСЛЕДСТВИЙ и определи МАКСИМАЛЬНЫЙ приоритет по шкале 1-6:\n\nПРИОРИТЕТ 1 (немедленное действие, секунды-минуты):\n- Угроза жизни: газ, пожар, дым, запах газа, обрушение\n- Последствия: катастрофические, затрагивает весь дом\n\nПРИОРИТЕТ 2 (срочно, минуты-часы):\n- Угроза здоровью: затопление, лед у двери, вода в подвале, отсутствие отопления зимой, прорыв трубы\n- Последствия: критические, затрагивает несколько квартир\n\nПРИОРИТЕТ 3 (в течение дня):\n- Серьёзное неудобство: нет ГВС >1 дня, мусор >3 дней, застрял лифт\n- Последствия: серьёзные, затрагивает подъезд\n\nПРИОРИТЕТ 4 (в течение недели):\n- Бытовые проблемы: течёт кран, скрипит дверь, нет света в подъезде\n- Последствия: умеренные, одна квартира\n\nПРИОРИТЕТ 5 (планово):\n- Эстетика: грязные окна, сколы, паутина\n- Последствия: минимальные\n\nПРИОРИТЕТ 6 (низкий):\n- Пожелания без проблемы\n\nАНАЛИЗ ПОСЛЕДСТВИЙ: {{ $('Анализ последствий').item.json.content }}\n\nФОРМАТ ОТВЕТА:\n{\n  \"priority\": \"ТОЛЬКО ЦИФРА ОТ 1 ДО 6\",\n  \"explanation\": \"краткое объяснение на русском языке (до 100 символов)\"\n}\n\nВАЖНО: ОТВЕЧАЙ ТОЛЬКО ЧИСТЫМ JSON БЕЗ КОДОВЫХ БЛОКОВ, БЕЗ КОММЕНТАРИЕВ, БЕЗ ПОЯСНЕНИЙ. НЕ ИСПОЛЬЗУЙ ```json ИЛИ ```.\nТОЛЬКО {\"priority\":\"цифра\",\"explanation\":\"текст\"}."
             }
           ]
         },
@@ -290,11 +256,11 @@
       "type": "@n8n/n8n-nodes-langchain.ollama",
       "typeVersion": 1,
       "position": [
-        1136,
-        32
+        2768,
+        144
       ],
-      "id": "9f5a57ed-39a7-4c5d-ad21-1b67d64ddaf0",
-      "name": "Получение приоритета",
+      "id": "06f65d09-9843-4a91-a497-e7342ebc1362",
+      "name": "Получение приоритета по анализу последствий",
       "credentials": {
         "ollamaApi": {
           "id": "ljirGh5nNJSqyEgS",
@@ -304,66 +270,167 @@
     },
     {
       "parameters": {
-        "jsCode": "return JSON.parse($input.first().json.content\n    .replace(/```json\\s*|\\s*```/gi, '')\n    .trim());"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        1488,
-        32
-      ],
-      "id": "a752ecbc-dc58-4886-81c4-0cd6ae19c72b",
-      "name": "Парсер в Json"
-    },
-    {
-      "parameters": {
-        "respondWith": "allIncomingItems",
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output }}",
+                    "rightValue": "Действие",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "ee9c531e-1f2f-4789-aa95-9462e2135ef0"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Действие"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0c67ce11-f650-4404-9c2e-3cc8c0fa3d69",
+                    "leftValue": "={{ $json.output }}",
+                    "rightValue": "Пожелание",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Пожелание"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c40f9790-6861-498f-9fe8-19a4d115fd72",
+                    "leftValue": "={{ $json.output }}",
+                    "rightValue": "Не требует действия",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Не требует действия"
+            }
+          ]
+        },
         "options": {}
       },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.5,
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
       "position": [
-        1712,
-        32
+        1760,
+        320
       ],
-      "id": "c25a732a-0271-476e-8ec2-3fc42e119afa",
-      "name": "Возвращение результата"
+      "id": "5247204f-71cc-4240-9d73-1ab8da5c0c2d",
+      "name": "Switch"
     },
     {
       "parameters": {
-        "options": {
-          "timezone": "UTC+3"
+        "modelId": {
+          "__rl": true,
+          "value": "gemma3:4b",
+          "mode": "list",
+          "cachedResultName": "gemma3:4b"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Определи тип сообщения из домового чата одним словом: \"Действие\", \"Пожелание\" или \"Не требует действия\".\n\nТИПЫ:\n- Действие: СООБЩЕНИЕ О ПРОБЛЕМЕ, ТРЕБУЮЩЕЙ ВМЕШАТЕЛЬСТВА УПРАВЛЯЮЩЕЙ КОМПАНИИ\n  • Угроза жизни/здоровью (газ, пожар, затопление, искрение)\n  • Антисанитария (мусор >3 дней, вода в подвале, крысы)\n  • Повреждения инфраструктуры (сломанная дверь, нет света в подъезде)\n  • Нарушения комфорта (нет отопления зимой, нет ГВС >1 дня)\n  • Констатация факта с риском («В подвале вода», «Соседи шумят после 23:00»)\n\n- Пожелание: выражение желания улучшить что-то БЕЗ констатации проблемы\n  • Хотим лавочку во дворе\n  • Добавьте освещение в подъезде\n  • ПОКРАСЬТЕ СТЕНЫ\n  • Установите видеонаблюдение\n  → Нет текущей проблемы, только предложение улучшения\n\n- Не требует действия: всё остальное\n  • Вопросы без проблемы («Когда приедет мастер?», «Сколько стоит?»)\n  • Социальное общение («Привет», «Спасибо», «Доброе утро»)\n  • Спам/троллинг/бессмысленный текст\n  • Заявки не по теме ЖКХ («Где купить чай?»)\n\nСООБЩЕНИЕ: \"{{ $json.content }}\"\n\nОтветь ОДНИМ СЛОВОМ: \"Действие\", \"Пожелание\" или \"Не требует действия\"."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.ollama",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        -48
+      ],
+      "id": "f05f18ce-cb41-4f53-aaa5-e8bd4ab724cb",
+      "name": "Проверка сообщения на тип1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "ljirGh5nNJSqyEgS",
+          "name": "Ollama account"
         }
+      }
+    },
+    {
+      "parameters": {
+        "model": "gemma3:4b",
+        "options": {}
       },
-      "type": "n8n-nodes-base.dateTime",
-      "typeVersion": 2,
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
       "position": [
-        240,
-        128
+        1360,
+        576
       ],
-      "id": "49eb6e1b-3406-436a-9f59-877b15e6c3d7",
-      "name": "Текущая дата(МСК)"
+      "id": "a40c73fc-5e13-4662-8d23-3ceabb2b63b5",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "ljirGh5nNJSqyEgS",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "1"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1520,
+        576
+      ],
+      "id": "901a69ea-5d86-4f21-b6be-c99376af5c89",
+      "name": "Simple Memory"
     },
     {
       "parameters": {
         "assignments": {
           "assignments": [
             {
-              "id": "e934b0ff-de02-4d7c-a784-35b667c1af73",
-              "name": "message",
-              "value": "={{ $json.body.message }}",
-              "type": "string"
-            },
-            {
-              "id": "ff8ccbf3-d74a-4a39-9835-5fa780661b8a",
-              "name": "resident_notes",
-              "value": "={{ $json.body.resident_notes }}",
-              "type": "string"
-            },
-            {
-              "id": "300e45dc-eed2-49f3-a301-0b3ce4c4ebd4",
-              "name": "currentDate",
-              "value": "={{ $json.body.timestamp }}",
+              "id": "762316f9-b2ca-4fcc-b88b-eda594b7603c",
+              "name": "chatInput",
+              "value": "=Определи тип сообщения из домового чата одним словом: \"Действие\", \"Пожелание\" или \"Не требует действия\".  \n\nУЧИТЫВАЙ КОНТЕКСТ ПРЕДЫДУЩИХ СООБЩЕНИЙ, ВОЗМОЖНО ЭТО СООБЩЕНИЕ НЕ ТРЕБУЕТ ДЕЙСТВИЙ, А ПРОСТО ЯВЛЯЕТСЯ СЛЕДСТВИЕМ ПРЕДЫДУЩИХ\n\nТИПЫ: - Действие: СООБЩЕНИЕ О ПРОБЛЕМЕ, ТРЕБУЮЩЕЙ ВМЕШАТЕЛЬСТВА УПРАВЛЯЮЩЕЙ КОМПАНИИ   \n• Угроза жизни/здоровью (газ, пожар, затопление, искрение)   \n• Антисанитария (мусор >3 дней, вода в подвале, крысы)   \n• Повреждения инфраструктуры (сломанная дверь, нет света в подъезде)   \n• Нарушения комфорта (нет отопления зимой, нет ГВС >1 дня)   \n• Констатация факта с риском («В подвале вода», «Соседи шумят после 23:00»)  \n\n- Пожелание: выражение желания улучшить что-то БЕЗ констатации проблемы   \n• Хотим лавочку во дворе   \n• Добавьте освещение в подъезде   \n• ПОКРАСЬТЕ СТЕНЫ   \n• Установите видеонаблюдение   \n→ Нет текущей проблемы, только предложение улучшения  \n\n- Не требует действия: всё остальное   \n• Вопросы без проблемы («Когда приедет мастер?», «Сколько стоит?»)   \n• Социальное общение («Привет», «Спасибо», «Доброе утро»)   \n• Спам/троллинг/бессмысленный текст   \n• Заявки не по теме ЖКХ («Где купить чай?»)  \n\nСООБЩЕНИЕ: \"{{ $json.body.message }}\"  Ответь ОДНИМ СЛОВОМ: \"Действие\", \"Пожелание\" или \"Не требует действия\".",
               "type": "string"
             }
           ]
@@ -373,46 +440,56 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        464,
-        -64
+        1280,
+        336
       ],
-      "id": "ffde0f0e-6cfe-4e75-aa30-d7d9d29ec293",
-      "name": "Json с заданной датой"
+      "id": "502de74a-feb2-405d-aacc-1c3257fc0401",
+      "name": "Edit Fields"
     },
     {
       "parameters": {
-        "assignments": {
-          "assignments": [
+        "modelId": {
+          "__rl": true,
+          "value": "gemma3:4b",
+          "mode": "list",
+          "cachedResultName": "gemma3:4b"
+        },
+        "messages": {
+          "values": [
             {
-              "id": "ab21ff1e-1571-47e7-b9b0-e899d0ce79ff",
-              "name": "message",
-              "value": "={{ $('Запрос начальных данных').item.json.body.message }}",
-              "type": "string"
-            },
-            {
-              "id": "a5d8c6fd-9a1e-4bd9-9794-049c1eede753",
-              "name": "resident_notes",
-              "value": "={{ $('Запрос начальных данных').item.json.body.resident_notes }}",
-              "type": "string"
-            },
-            {
-              "id": "7852baea-9664-420a-8f82-a8a1b11dfec8",
-              "name": "currentDate",
-              "value": "={{ $json.currentDate }}",
-              "type": "string"
+              "content": "=Обработай это сообщение, убери из него экспрессию, ругательства, вопросы. Оставь только саму суть\n\nСообщение:  {{ $json.body.message }}\n\nОТВЕТ НАПИШИ БЕЗ ПОЯСНЕНИЙ, ПРОСТО ВЫВЕДИ ОБРАБОТАННОЕ СООБЩЕНИЕ"
             }
           ]
         },
         "options": {}
       },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "@n8n/n8n-nodes-langchain.ollama",
+      "typeVersion": 1,
       "position": [
-        464,
-        128
+        1056,
+        -160
       ],
-      "id": "0af9eb4a-ae51-4751-9fa9-dc5738cee026",
-      "name": "Json с текущей датой"
+      "id": "b2a5443d-922d-4928-995c-8f4f73d6c236",
+      "name": "Упрощение сообщения1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "ljirGh5nNJSqyEgS",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1440,
+        336
+      ],
+      "id": "30451323-c206-4b17-8a8a-f1e366a0df72",
+      "name": "(Плохо работает, нужно дорабатывать)"
     }
   ],
   "pinData": {},
@@ -421,123 +498,7 @@
       "main": [
         [
           {
-            "node": "Запрос не пустой?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Запрос не пустой?": {
-      "main": [
-        [
-          {
-            "node": "Проверка осмысленности ввода",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Некорректный/Бессмысленный ввод json",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Проверка осмысленности ввода": {
-      "main": [
-        [
-          {
-            "node": "Запрос имеет смысл?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Запрос имеет смысл?": {
-      "main": [
-        [
-          {
-            "node": "Дата указана?",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Некорректный/Бессмысленный ввод json",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Дата указана?": {
-      "main": [
-        [
-          {
-            "node": "Json с заданной датой",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Текущая дата(МСК)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Нужно объяснение выбора?": {
-      "main": [
-        [
-          {
-            "node": "Промпт с объяснением выбора приоритета",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Промпт без объяснения выбора приоритета",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Некорректный/Бессмысленный ввод json": {
-      "main": [
-        [
-          {
-            "node": "Некорректный/Бессмысленный ввод",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Промпт с объяснением выбора приоритета": {
-      "main": [
-        [
-          {
-            "node": "Получение приоритета",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Промпт без объяснения выбора приоритета": {
-      "main": [
-        [
-          {
-            "node": "Получение приоритета",
+            "node": "Edit Fields",
             "type": "main",
             "index": 0
           }
@@ -548,14 +509,65 @@
       "main": [
         [
           {
-            "node": "Парсер в Json",
+            "node": "Парсер json",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Парсер в Json": {
+    "Не требует действия": {
+      "main": [
+        [
+          {
+            "node": "Ответ на не требующий действия ввод",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Анализ возможеных проблем": {
+      "main": [
+        [
+          {
+            "node": "Анализ последствий",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Анализ последствий": {
+      "main": [
+        [
+          {
+            "node": "Получение приоритета по анализу последствий",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Нужно объяснение выбора?": {
+      "main": [
+        [
+          {
+            "node": "Возвращение результата",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Только приоритет",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Только приоритет": {
       "main": [
         [
           {
@@ -566,18 +578,7 @@
         ]
       ]
     },
-    "Текущая дата(МСК)": {
-      "main": [
-        [
-          {
-            "node": "Json с текущей датой",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Json с заданной датой": {
+    "Парсер json": {
       "main": [
         [
           {
@@ -588,11 +589,80 @@
         ]
       ]
     },
-    "Json с текущей датой": {
+    "Получение приоритета по анализу последствий": {
       "main": [
         [
           {
-            "node": "Нужно объяснение выбора?",
+            "node": "Парсер json",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Анализ возможеных проблем",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Получение приоритета",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Не требует действия",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "(Плохо работает, нужно дорабатывать)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "(Плохо работает, нужно дорабатывать)",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "(Плохо работает, нужно дорабатывать)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "(Плохо работает, нужно дорабатывать)": {
+      "main": [
+        [
+          {
+            "node": "Switch",
             "type": "main",
             "index": 0
           }
@@ -609,10 +679,10 @@
     "timezone": "Europe/Moscow",
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "ebafaab5-131f-4088-b39d-ed60a6a29b1c",
+  "versionId": "20ea46f2-f273-4315-b5a7-4e33c1921ec0",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "495de335b203dba75e85eee086dd572a10a698c5841ea224191355325b642b51"
+    "instanceId": "aa55928e16ab72babb87c711a72f87252d0cdea488d8915de05718b8b430205b"
   },
   "id": "Y9zsLqFSVe33rvnT",
   "tags": []

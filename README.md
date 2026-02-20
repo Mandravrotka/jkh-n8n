@@ -26,7 +26,7 @@
 - **n8n** — платформа для автоматизации рабочих процессов
 - **Docker Compose** — унифицированное развёртывание
 
-## Для начала работы
+## Для начала работы (Windows)
 
 Установите зависимости: выполните в PowerShell `winget install Ollama.Ollama`, затем `ollama pull gemma3:4b`, после этого установите Docker Desktop через `winget install Docker.DockerDesktop`. 
 
@@ -42,6 +42,25 @@
 
 Теперь откройте файл `interface.html` в браузере — система готова к тестированию.
 
+## Для начала работы (Linux)
+
+Установите зависимости: выполните `sudo apt-get install docker-compose`, затем добавьте текущего пользователя в группу docker командой `sudo usermod -aG docker $USER && newgrp docker`. Установите Ollama: `curl -fsSL https://ollama.com/install.sh | sh`, после чего скачайте модель `ollama pull gemma3:4b`.
+
+Запустите Ollama в фоновом режиме: `ollama serve &`.
+
+Склонируйте репозиторий и перейдите в папку проекта. Скопируйте шаблон окружения: `cp .env.example .env`. Откройте файл `.env` и замените значения на свои.
+
+Запустите n8n через Docker Compose: `docker-compose up -d`.
+
+Импортируйте конфигурацию: перейдите в папку `setup`, сделайте скрипты исполняемыми `chmod +x *.sh`, затем выполните `./init.sh` — скрипт автоматически импортирует credentials и workflow.
+
+Откройте в браузере `http://localhost:5678`, найдите воркфлоу «jkh-priority-workflow» и активируйте его.
+
+Теперь откройте файл `interface.html` в браузере — система готова к тестированию.
+
+## Интеграция с Telegram
+
+Для работы с Telegram требуется туннель к локальному серверу через ngrok. Создайте аккаунт ngrok и запустите туннель в отдельном терминале командой `ngrok http 5678`, скопируйте полученный HTTPS URL (например, `https://abcd-1234.ngrok-free.app`) и укажите его в `.env` вместе с токеном вашего бота: `TELEGRAM_BOT_TOKEN=ваш_токен_здесь` и `WEBHOOK_URL=https://ваш-ngrok-url.ngrok-free.app`.
 ## Тесты
 
 Для запуска тестов перейдите в папку `tests` и выполните `powershell -ExecutionPolicy Bypass -File .\run-tests.ps1`.
